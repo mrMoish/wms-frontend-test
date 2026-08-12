@@ -4,37 +4,155 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>WMS А2 — Товары на складе</title>
+  
+  <!-- Внешние ресурсы (шрифты и иконки) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,200..900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <style>
-    /* ============================================
-       CSS-ПЕРЕМЕННЫЕ
-       ============================================ */
-    :root {
-      --bg: #0a0f14;
-      --surface: #0f151c;
-      --surface-raised: #151d27;
-      --border: #1e2a38;
-      --border-subtle: rgba(30, 42, 56, 0.5);
-      --fg: #e8edf3;
-      --muted: #6b7f95;
-      --accent: #14b896;
-      --accent-dark: #0d9478;
-      --accent-glow: rgba(20, 184, 150, 0.15);
-      --status-ready: #22c55e;
-      --status-storage: #38bdf8;
-      --status-assembly: #f59e0b;
-      --status-written-off: #ef4444;
-      --radius-sm: 8px;
-      --radius-md: 12px;
-      --radius-lg: 16px;
-      --radius-xl: 20px;
-      --radius-full: 999px;
-      --shadow-glow: 0 0 20px var(--accent-glow);
-    }
+  
+  <!-- Подключение наших стилей -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
 
-    /* ============================================
+  <!-- Фоновые слои -->
+  <div class="bg-atmosphere" aria-hidden="true"></div>
+  <div class="bg-grid" aria-hidden="true"></div>
+
+  <!-- Приложение -->
+  <div class="app">
+
+    <!-- ===== HEADER ===== -->
+    <header class="header">
+      <div class="container header-inner">
+        <div class="logo-group">
+          <div class="logo-icon" aria-hidden="true">A2</div>
+          <span class="logo-text">WMS А2</span>
+        </div>
+
+        <nav class="nav" aria-label="Основная навигация">
+          <a class="nav-link" href="#">Приёмка</a>
+          <a class="nav-link active" href="#" aria-current="page">Товары</a>
+          <a class="nav-link" href="#">Отгрузка</a>
+          <a class="nav-link" href="#">Отчёты</a>
+        </nav>
+
+        <div class="header-right">
+          <button class="icon-btn" aria-label="Уведомления">
+            <i class="fa-regular fa-bell"></i>
+          </button>
+          <div class="avatar" aria-label="Пользователь">СК</div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ===== MAIN ===== -->
+    <main class="main">
+      <div class="container">
+
+        <!-- Заголовок секции -->
+        <div class="section-header">
+          <div>
+            <h1 class="section-title">Товары на складе</h1>
+            <p class="section-meta">
+              Всего позиций: <span class="counter-pill" id="totalCount">0</span>
+              <span class="meta-separator">|</span>
+              Показано: <span class="meta-shown" id="shownCount">0</span>
+            </p>
+          </div>
+        </div>
+
+        <!-- Поиск + Фильтры -->
+        <div class="controls-row">
+          <div class="search-wrapper">
+            <i class="fa-solid fa-magnifying-glass search-icon" aria-hidden="true"></i>
+            <input
+              type="text"
+              id="searchInput"
+              class="search-input"
+              placeholder="Поиск по товару или SKU..."
+              aria-label="Поиск по товару или SKU"
+            >
+          </div>
+          <div class="filters" id="filterContainer" role="group" aria-label="Фильтр по статусу">
+            <button class="filter-btn active" data-filter="all">Все</button>
+            <button class="filter-btn" data-filter="Готов к отгрузке">
+              <span class="filter-dot" style="background: var(--status-ready);"></span>Готов к отгрузке
+            </button>
+            <button class="filter-btn" data-filter="На хранении">
+              <span class="filter-dot" style="background: var(--status-storage);"></span>На хранении
+            </button>
+            <button class="filter-btn" data-filter="На сборке">
+              <span class="filter-dot" style="background: var(--status-assembly);"></span>На сборке
+            </button>
+            <button class="filter-btn" data-filter="Списан">
+              <span class="filter-dot" style="background: var(--status-written-off);"></span>Списан
+            </button>
+          </div>
+        </div>
+
+        <!-- Таблица -->
+        <div class="table-container" id="tableContainer">
+          <div class="table-head" role="row">
+            <div class="table-head-cell">SKU</div>
+            <div class="table-head-cell">Товар</div>
+            <div class="table-head-cell">Ячейка</div>
+            <div class="table-head-cell">Статус</div>
+            <div class="table-head-cell">Действие</div>
+          </div>
+          <div class="table-body" id="tableBody" role="rowgroup">
+            <!-- Строки рендерятся JS -->
+          </div>
+        </div>
+
+        <!-- Пустое состояние -->
+        <div id="emptyState" class="empty-state hidden">
+          <div class="empty-state-icon" aria-hidden="true">
+            <i class="fa-regular fa-face-meh"></i>
+          </div>
+          <p class="empty-state-title">Ничего не найдено</p>
+          <p class="empty-state-text">Попробуйте изменить параметры поиска или фильтра</p>
+        </div>
+
+      </div>
+    </main>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="footer">
+      WMS А2 &mdash; Система управления складом &copy; 2026
+    </footer>
+  </div>
+
+  <!-- ===== МОДАЛЬНАЯ КАРТОЧКА ===== -->
+  <div class="modal-overlay" id="modalOverlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-card">
+      <div class="modal-accent-bar" id="modalAccentBar"></div>
+      <button class="btn-close-modal" id="btnCloseModal" aria-label="Закрыть карточку">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+      <div class="modal-body">
+        <div class="modal-header">
+          <div class="modal-icon-box">
+            <i class="fa-solid fa-box"></i>
+          </div>
+          <div>
+            <h2 class="modal-title" id="modalTitle"></h2>
+            <p class="modal-sku" id="modalSku"></p>
+          </div>
+        </div>
+        <div id="modalDetails"></div>
+        <div class="modal-status-row">
+          <span class="modal-status-label">Текущий статус</span>
+          <span id="modalStatus"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Подключение нашего скрипта -->
+  <script src="script.js"></script>
+</body>
+</html>    /* ============================================
        СБРОС И БАЗОВЫЕ СТИЛИ
        ============================================ */
     *,
